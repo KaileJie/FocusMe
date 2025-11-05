@@ -503,3 +503,33 @@ header h1 {
     }
 }
 
+/* iOS PWA specific styles */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari specific styles */
+    body {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    input, textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+    
+    /* Better scrolling on iOS */
+    .container {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Safe area insets for iPhone X and newer */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+        padding-top: max(40px, env(safe-area-inset-top));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+}
+

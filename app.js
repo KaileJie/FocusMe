@@ -354,6 +354,19 @@ function renderHistory() {
 window.toggleTodo = toggleTodo;
 window.deleteTodo = deleteTodo;
 
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('ServiceWorker registration successful');
+      })
+      .catch((error) => {
+        console.log('ServiceWorker registration failed');
+      });
+  });
+}
+
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', init);
 
