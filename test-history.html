@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test History Data Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #FAFAFA;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #6366F1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4F46E5;
+        }
+        .info {
+            background: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        pre {
+            background: #F5F5F7;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍅 Test History Data Generator</h1>
+        <p>This will generate test data for the past week with different pomodoro counts each day.</p>
+        
+        <div class="info">
+            <strong>Test Data Plan:</strong><br>
+            • Monday: 8 pomodoros (200 min)<br>
+            • Tuesday: 12 pomodoros (300 min)<br>
+            • Wednesday: 6 pomodoros (150 min)<br>
+            • Thursday: 10 pomodoros (250 min)<br>
+            • Friday: 14 pomodoros (350 min)<br>
+            • Saturday: 4 pomodoros (100 min)<br>
+            • Sunday: 2 pomodoros (50 min)
+        </div>
+        
+        <button onclick="generateTestData()">Generate Test Data</button>
+        <button onclick="clearTestData()">Clear Test Data</button>
+        <button onclick="viewCurrentData()">View Current Data</button>
+        
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        function generateTestData() {
+            const today = new Date();
+            const history = [];
+            
+            // Generate data for the past 7 days with varying pomodoro counts
+            const testData = [
+                { dayOffset: 6, pomodoros: 8, tasks: 5, minutes: 200 },  // Monday
+                { dayOffset: 5, pomodoros: 12, tasks: 8, minutes: 300 }, // Tuesday
+                { dayOffset: 4, pomodoros: 6, tasks: 4, minutes: 150 },  // Wednesday
+                { dayOffset: 3, pomodoros: 10, tasks: 6, minutes: 250 }, // Thursday
+                { dayOffset: 2, pomodoros: 14, tasks: 10, minutes: 350 }, // Friday
+                { dayOffset: 1, pomodoros: 4, tasks: 2, minutes: 100 },  // Saturday
+                { dayOffset: 0, pomodoros: 2, tasks: 1, minutes: 50 },   // Sunday (today)
+            ];
+            
+            testData.forEach(({ dayOffset, pomodoros, tasks, minutes }) => {
+                const date = new Date(today);
+                date.setDate(date.getDate() - dayOffset);
+                date.setHours(0, 0, 0, 0);
+                
+                history.push({
+                    date: date.toDateString(),
+                    pomodoros: pomodoros,
+                    completedTodos: tasks,
+                    minutes: minutes
+                });
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('focusMeHistory', JSON.stringify(history));
+            
+            // Also update today's stats
+            const todayData = testData[testData.length - 1];
+            localStorage.setItem('focusMeStats', JSON.stringify({
+                pomodoros: todayData.pomodoros,
+                completedTodos: todayData.tasks,
+                minutes: todayData.minutes
+            }));
+            
+            document.getElementById('result').innerHTML = `
+                <div class="info" style="background: #D1FAE5; border-color: #10B981;">
+                    <strong>✅ Test data generated successfully!</strong><br><br>
+                    <strong>Generated ${history.length} days of data:</strong><br>
+                    ${history.map(h => {
+                        const d = new Date(h.date);
+                        return `${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${h.pomodoros} pomodoros, ${h.minutes} min`;
+                    }).join('<br>')}
+                    <br><br>
+                    <strong>Next steps:</strong><br>
+                    1. Go back to <a href="/">your app</a><br>
+                    2. Refresh the page<br>
+                    3. Check the History & Analytics section<br>
+                    4. Try switching between Week/Month/Year filters
+                </div>
+            `;
+        }
+        
+        function clearTestData() {
+            localStorage.removeItem('focusMeHistory');
+            localStorage.removeItem('focusMeStats');
+            document.getElementById('result').innerHTML = `
+                <div class="info" style="background: #FEE2E2; border-color: #EF4444;">
+                    <strong>🗑️ Test data cleared!</strong><br>
+                    All history data has been removed from localStorage.
+                </div>
+            `;
+        }
+        
+        function viewCurrentData() {
+            const history = JSON.parse(localStorage.getItem('focusMeHistory') || '[]');
+            const stats = JSON.parse(localStorage.getItem('focusMeStats') || '{}');
+            
+            document.getElementById('result').innerHTML = `
+                <div class="info">
+                    <strong>Current Data:</strong><br><br>
+                    <strong>History (${history.length} records):</strong><br>
+                    <pre>${JSON.stringify(history, null, 2)}</pre>
+                    <br>
+                    <strong>Today's Stats:</strong><br>
+                    <pre>${JSON.stringify(stats, null, 2)}</pre>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+

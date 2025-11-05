@@ -119,7 +119,14 @@ function loadData() {
     
     if (savedTodos) state.todos = JSON.parse(savedTodos);
     if (savedStats) state.todayStats = JSON.parse(savedStats);
-    if (savedHistory) state.history = JSON.parse(savedHistory);
+    if (savedHistory) {
+        try {
+            state.history = JSON.parse(savedHistory);
+        } catch (e) {
+            console.error('Error parsing history:', e);
+            state.history = [];
+        }
+    }
     
     // 检查是否是新的日期，如果是则重置今日统计
     const today = new Date().toDateString();
