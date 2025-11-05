@@ -594,11 +594,21 @@ function drawChart(data) {
 function renderHistory() {
     const filteredHistory = getFilteredHistory();
     
-    // 绘制图表
+    // 确保chart元素存在
+    const chart = getHistoryChart();
+    if (!chart) {
+        console.warn('Chart element not ready, retrying...');
+        setTimeout(renderHistory, 100);
+        return;
+    }
+    
+    // 绘制图表 - 先绘制图表
     if (filteredHistory.length > 0) {
         const groupedData = groupHistoryByDate(filteredHistory);
+        console.log('Drawing chart with data:', groupedData);
         drawChart(groupedData);
     } else {
+        console.log('No data, drawing empty chart');
         drawChart({});
     }
     
