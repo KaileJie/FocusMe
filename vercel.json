@@ -3,7 +3,7 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": ".",
   "framework": null,
-  "installCommand": "echo 'Skipping install for static site'",
+  "installCommand": "echo 'No dependencies needed for static site'",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
