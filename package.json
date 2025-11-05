@@ -1,0 +1,42 @@
+{
+  "name": "focus-me",
+  "version": "1.0.0",
+  "description": "Focus Me - A beautiful Pomodoro timer app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "dist": "electron-builder --publish=never"
+  },
+  "keywords": [
+    "pomodoro",
+    "timer",
+    "productivity"
+  ],
+  "author": "Focus Me",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.focusme.app",
+    "productName": "Focus Me",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "icon.icns"
+    },
+    "files": [
+      "**/*",
+      "!node_modules",
+      "!dist",
+      "!.git"
+    ]
+  }
+}
+

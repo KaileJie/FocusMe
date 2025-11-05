@@ -28,3 +28,10 @@ ios/
 .capacitor/
 capacitor.config.json
 
+# Electron
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+
