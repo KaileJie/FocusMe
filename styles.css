@@ -67,7 +67,7 @@ body::before {
 }
 
 /* macOS traffic light buttons */
-.traffic-lights {
+.timer-container .traffic-lights {
     position: absolute;
     top: 16px;
     left: 16px;
