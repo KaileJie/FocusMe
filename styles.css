@@ -57,34 +57,7 @@ body {
     position: relative;
 }
 
-/* macOS traffic light buttons */
-.timer-container .traffic-lights {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    display: flex;
-    gap: 8px;
-    z-index: 10;
-}
-
-.traffic-light {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 0.5px solid rgba(0, 0, 0, 0.1);
-}
-
-.traffic-light.close {
-    background: #ff5f57;
-}
-
-.traffic-light.minimize {
-    background: #ffbd2e;
-}
-
-.traffic-light.maximize {
-    background: #28c840;
-}
+/* macOS traffic light buttons - removed, using native Electron window controls */
 
 header {
     text-align: center;
