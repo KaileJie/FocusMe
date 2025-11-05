@@ -1,8 +1,9 @@
 {
   "version": 2,
-  "buildCommand": null,
+  "buildCommand": "npm run vercel-build",
   "outputDirectory": ".",
   "framework": null,
+  "installCommand": "echo 'Skipping install for static site'",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
