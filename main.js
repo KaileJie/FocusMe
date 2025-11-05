@@ -7,14 +7,12 @@ let tray;
 function createWindow() {
   // Create the browser window with macOS style
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
-    backgroundColor: '#667eea',
-    titleBarStyle: 'hiddenInset', // macOS style title bar
-    vibrancy: 'ultra-dark', // macOS vibrancy effect
-    visualEffectState: 'active',
+    width: 1200,
+    height: 900,
+    minWidth: 900,
+    minHeight: 700,
+    backgroundColor: '#FAFAFA',
+    titleBarStyle: 'default', // Standard macOS title bar
     frame: true,
     transparent: false,
     webPreferences: {
@@ -24,8 +22,9 @@ function createWindow() {
     }
   });
 
-  // Load the app
-  mainWindow.loadFile('index.html');
+  // Load the app - use absolute path
+  const indexPath = path.join(__dirname, 'index.html');
+  mainWindow.loadFile(indexPath);
 
   // Open DevTools in development
   if (process.env.NODE_ENV === 'development') {
