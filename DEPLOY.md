@@ -21,6 +21,7 @@ This guide will help you deploy Focus Me to Vercel so others can use your Pomodo
    - Sign up/login with your GitHub account
    - Click "Add New Project"
    - Import your GitHub repository
+   - **Set Project Name**: Use a unique name like `focus-me-pomodoro` or `my-focus-timer` (if `focus-me` already exists)
    - Vercel will auto-detect it's a static site
    - Click "Deploy"
 

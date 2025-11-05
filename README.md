@@ -22,7 +22,8 @@ This project is ready to deploy on Vercel:
 
 1. Push your code to GitHub
 2. Import your repository on [Vercel](https://vercel.com)
-3. Vercel will automatically detect and deploy your static site
+3. **Choose a unique project name** (e.g., `focus-me-pomodoro`, `my-focus-timer`) if `focus-me` already exists
+4. Vercel will automatically detect and deploy your static site
 
 Or use Vercel CLI:
 
