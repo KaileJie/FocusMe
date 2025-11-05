@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+main.js
+generate_icons.py
+generate-icons.html
+generate-test-data.js
+test-history.html
+DEPLOY.md
+ELECTRON_SETUP.md
+iOS_SETUP.md
+

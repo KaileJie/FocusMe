@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
@@ -9,6 +12,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/service-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
