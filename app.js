@@ -447,13 +447,13 @@ function groupHistoryByDate(history) {
     return grouped;
 }
 
-// 绘制柱状图
+// 绘制竖向柱状图
 function drawChart(data) {
     if (!historyChart) return;
     
     const ctx = historyChart.getContext('2d');
     const width = historyChart.width = historyChart.offsetWidth;
-    const height = historyChart.height = 200;
+    const height = historyChart.height = 300; // 增加高度以显示更多细节
     
     // 清除画布
     ctx.clearRect(0, 0, width, height);
@@ -467,36 +467,75 @@ function drawChart(data) {
     }
     
     const labels = Object.keys(data);
-    const values = labels.map(key => data[key].pomodoros);
+    const pomodoroValues = labels.map(key => data[key].pomodoros);
+    const minuteValues = labels.map(key => data[key].minutes);
+    
+    // 可以选择显示番茄数或分钟数，默认显示番茄数
+    const values = pomodoroValues;
     const maxValue = Math.max(...values, 1);
     
-    const padding = 40;
-    const chartWidth = width - padding * 2;
-    const chartHeight = height - padding * 2;
-    const barWidth = chartWidth / labels.length * 0.7;
+    const padding = { top: 20, right: 20, bottom: 50, left: 50 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
     const barSpacing = chartWidth / labels.length;
+    const barWidth = barSpacing * 0.6; // 柱子宽度为间距的60%
+    
+    // 绘制Y轴和网格线
+    ctx.strokeStyle = '#E2E8F0';
+    ctx.lineWidth = 1;
+    
+    // Y轴
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, height - padding.bottom);
+    ctx.lineTo(width - padding.right, height - padding.bottom);
+    ctx.stroke();
+    
+    // 绘制网格线
+    const gridLines = 5;
+    for (let i = 0; i <= gridLines; i++) {
+        const y = padding.top + (chartHeight / gridLines) * i;
+        ctx.strokeStyle = '#F1F5F9';
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+        
+        // Y轴标签
+        const value = Math.round(maxValue * (1 - i / gridLines));
+        ctx.fillStyle = '#64748B';
+        ctx.font = '11px -apple-system';
+        ctx.textAlign = 'right';
+        ctx.fillText(value.toString(), padding.left - 10, y + 4);
+    }
     
     // 绘制柱状图
     labels.forEach((label, index) => {
-        const value = values[index];
-        const barHeight = (value / maxValue) * chartHeight;
-        const x = padding + index * barSpacing + (barSpacing - barWidth) / 2;
-        const y = height - padding - barHeight;
+        const pomodoroValue = pomodoroValues[index];
+        const minuteValue = minuteValues[index];
+        const barHeight = (pomodoroValue / maxValue) * chartHeight;
+        const x = padding.left + index * barSpacing + (barSpacing - barWidth) / 2;
+        const y = height - padding.bottom - barHeight;
         
-        // 柱状图
-        const gradient = ctx.createLinearGradient(0, y, 0, height - padding);
+        // 柱状图渐变
+        const gradient = ctx.createLinearGradient(x, y, x, height - padding.bottom);
         gradient.addColorStop(0, '#EF4444');
         gradient.addColorStop(1, '#DC2626');
         
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, barWidth, barHeight);
         
-        // 数值标签
-        if (value > 0) {
+        // 柱子顶部数值标签（番茄数）
+        if (pomodoroValue > 0) {
             ctx.fillStyle = '#0F172A';
-            ctx.font = '12px -apple-system';
+            ctx.font = 'bold 12px -apple-system';
             ctx.textAlign = 'center';
-            ctx.fillText(value, x + barWidth / 2, y - 5);
+            ctx.fillText(pomodoroValue.toString(), x + barWidth / 2, y - 8);
+            
+            // 显示分钟数（小字）
+            ctx.fillStyle = '#64748B';
+            ctx.font = '10px -apple-system';
+            ctx.fillText(`${minuteValue}m`, x + barWidth / 2, y - 20);
         }
         
         // X轴标签
@@ -504,20 +543,20 @@ function drawChart(data) {
         ctx.font = '11px -apple-system';
         ctx.textAlign = 'center';
         ctx.save();
-        ctx.translate(x + barWidth / 2, height - padding + 15);
-        ctx.rotate(-Math.PI / 4);
+        ctx.translate(x + barWidth / 2, height - padding.bottom + 20);
+        // 如果标签太长，旋转45度
+        if (label.length > 8) {
+            ctx.rotate(-Math.PI / 4);
+        }
         ctx.fillText(label, 0, 0);
         ctx.restore();
     });
     
-    // Y轴刻度
-    ctx.strokeStyle = '#E2E8F0';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
+    // 图表标题
+    ctx.fillStyle = '#0F172A';
+    ctx.font = 'bold 12px -apple-system';
+    ctx.textAlign = 'left';
+    ctx.fillText('Pomodoros', padding.left, padding.top - 5);
 }
 
 function renderHistory() {
