@@ -32,57 +32,66 @@
     <style>
         /* Fallback background in case CSS doesn't load */
         body {
-            background-color: #FAFAFA;
+            background-color: hsl(225.9, 100%, 96.7%);
             margin: 0;
             padding: 0;
+        }
+        .header-content {
+            display: flex !important;
+            align-items: center !important;
+            flex-direction: row !important;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="tomato-logo">
-                <svg class="tomato-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Main tomato body - more rounded and cute -->
-                    <ellipse cx="60" cy="70" rx="42" ry="45" fill="#EF4444"/>
-                    <ellipse cx="60" cy="65" rx="42" ry="45" fill="url(#tomatoGradient)"/>
-                    
-                    <!-- Cute face - eyes -->
-                    <circle cx="48" cy="60" r="6" fill="#FFFFFF"/>
-                    <circle cx="72" cy="60" r="6" fill="#FFFFFF"/>
-                    <circle cx="48" cy="60" r="3.5" fill="#1F2937"/>
-                    <circle cx="72" cy="60" r="3.5" fill="#1F2937"/>
-                    <ellipse cx="49" cy="58" rx="1.5" ry="2" fill="#FFFFFF"/>
-                    <ellipse cx="73" cy="58" rx="1.5" ry="2" fill="#FFFFFF"/>
-                    
-                    <!-- Cute smile -->
-                    <path d="M 52 72 Q 60 78 68 72" stroke="#1F2937" stroke-width="3" fill="none" stroke-linecap="round"/>
-                    
-                    <!-- Cheeks blush -->
-                    <ellipse cx="38" cy="68" rx="6" ry="5" fill="#FCA5A5" opacity="0.6"/>
-                    <ellipse cx="82" cy="68" rx="6" ry="5" fill="#FCA5A5" opacity="0.6"/>
-                    
-                    <!-- Stem with leaf -->
-                    <path d="M55 25 L50 15 L60 15 Z" fill="#10B981"/>
-                    <ellipse cx="57" cy="15" rx="5" ry="2.5" fill="#059669"/>
-                    <ellipse cx="62" cy="18" rx="3" ry="6" fill="#10B981" transform="rotate(-20 62 18)"/>
-                    
-                    <!-- Highlight shine -->
-                    <ellipse cx="50" cy="50" rx="12" ry="20" fill="#FFFFFF" opacity="0.4"/>
-                    <ellipse cx="52" cy="52" rx="6" ry="12" fill="#FFFFFF" opacity="0.5"/>
-                    
-                    <!-- Gradient definition -->
-                    <defs>
-                        <linearGradient id="tomatoGradient" x1="20" y1="20" x2="100" y2="110" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#DC2626"/>
-                            <stop offset="50%" stop-color="#EF4444"/>
-                            <stop offset="100%" stop-color="#F87171"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
+            <div class="header-content">
+                <div class="tomato-logo">
+                    <svg class="tomato-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main tomato body - more rounded and cute -->
+                        <ellipse cx="60" cy="70" rx="42" ry="45" fill="#EF4444"/>
+                        <ellipse cx="60" cy="65" rx="42" ry="45" fill="url(#tomatoGradient)"/>
+                        
+                        <!-- Cute face - eyes -->
+                        <circle cx="48" cy="60" r="6" fill="#FFFFFF"/>
+                        <circle cx="72" cy="60" r="6" fill="#FFFFFF"/>
+                        <circle cx="48" cy="60" r="3.5" fill="#1F2937"/>
+                        <circle cx="72" cy="60" r="3.5" fill="#1F2937"/>
+                        <ellipse cx="49" cy="58" rx="1.5" ry="2" fill="#FFFFFF"/>
+                        <ellipse cx="73" cy="58" rx="1.5" ry="2" fill="#FFFFFF"/>
+                        
+                        <!-- Cute smile -->
+                        <path d="M 52 72 Q 60 78 68 72" stroke="#1F2937" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        
+                        <!-- Cheeks blush -->
+                        <ellipse cx="38" cy="68" rx="6" ry="5" fill="#FCA5A5" opacity="0.6"/>
+                        <ellipse cx="82" cy="68" rx="6" ry="5" fill="#FCA5A5" opacity="0.6"/>
+                        
+                        <!-- Stem with leaf -->
+                        <path d="M55 25 L50 15 L60 15 Z" fill="#10B981"/>
+                        <ellipse cx="57" cy="15" rx="5" ry="2.5" fill="#059669"/>
+                        <ellipse cx="62" cy="18" rx="3" ry="6" fill="#10B981" transform="rotate(-20 62 18)"/>
+                        
+                        <!-- Highlight shine -->
+                        <ellipse cx="50" cy="50" rx="12" ry="20" fill="#FFFFFF" opacity="0.4"/>
+                        <ellipse cx="52" cy="52" rx="6" ry="12" fill="#FFFFFF" opacity="0.5"/>
+                        
+                        <!-- Gradient definition -->
+                        <defs>
+                            <linearGradient id="tomatoGradient" x1="20" y1="20" x2="100" y2="110" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#DC2626"/>
+                                <stop offset="50%" stop-color="#EF4444"/>
+                                <stop offset="100%" stop-color="#F87171"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="header-text">
+                    <h1>Focus Me</h1>
+                    <p class="subtitle">Focus every moment, achieve every day</p>
+                </div>
             </div>
-            <h1>Focus Me</h1>
-            <p class="subtitle">Focus every moment, achieve every day</p>
         </header>
 
         <div class="main-content">
@@ -167,7 +176,13 @@
                     <div id="chartContainer" class="chart-container">
                         <canvas id="historyChart" width="800" height="300"></canvas>
                     </div>
-                    <div id="historyList" class="history-list"></div>
+                    <div class="history-details-toggle">
+                        <button id="toggleHistoryDetails" class="toggle-btn" aria-expanded="false">
+                            <span class="toggle-label">View Details</span>
+                            <span class="toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div id="historyList" class="history-list" style="display: none;"></div>
                 </div>
             </section>
         </div>
