@@ -31,6 +31,16 @@ const todayPomodoros = document.getElementById('todayPomodoros');
 const todayTodos = document.getElementById('todayTodos');
 const todayMinutes = document.getElementById('todayMinutes');
 const historyList = document.getElementById('historyList');
+let historyChart = null;
+let currentPeriod = 'week'; // week, month, year
+
+// 延迟获取chart元素，确保DOM已加载
+function getHistoryChart() {
+    if (!historyChart) {
+        historyChart = document.getElementById('historyChart');
+    }
+    return historyChart;
+}
 
 // 请求通知权限
 function requestNotificationPermission() {
@@ -104,9 +114,7 @@ function init() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            if (historyChart) {
-                renderHistory();
-            }
+            renderHistory();
         }, 250);
     });
     
@@ -478,9 +486,6 @@ function drawChart(data) {
     chart.width = width * dpr;
     chart.height = height * dpr;
     ctx.scale(dpr, dpr);
-    
-    // 清除画布
-    ctx.clearRect(0, 0, width, height);
     
     // 清除画布
     ctx.clearRect(0, 0, width, height);
