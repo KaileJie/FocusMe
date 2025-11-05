@@ -67,6 +67,9 @@ function sendNotification(title, options = {}) {
 
 // 初始化
 function init() {
+    // 确保获取chart元素
+    historyChart = document.getElementById('historyChart');
+    
     loadData();
     updateDisplay();
     renderTodos();
@@ -100,9 +103,18 @@ function init() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            renderHistory();
+            if (historyChart) {
+                renderHistory();
+            }
         }, 250);
     });
+    
+    // 确保图表在页面完全加载后渲染
+    setTimeout(() => {
+        if (historyChart) {
+            renderHistory();
+        }
+    }, 100);
 }
 
 // 数据持久化
@@ -449,11 +461,24 @@ function groupHistoryByDate(history) {
 
 // 绘制竖向柱状图
 function drawChart(data) {
-    if (!historyChart) return;
+    if (!historyChart) {
+        console.warn('Chart element not found');
+        return;
+    }
     
     const ctx = historyChart.getContext('2d');
-    const width = historyChart.width = historyChart.offsetWidth;
-    const height = historyChart.height = 300; // 增加高度以显示更多细节
+    // 设置canvas尺寸，确保清晰度
+    const rect = historyChart.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const width = rect.width;
+    const height = 300;
+    
+    historyChart.width = width * dpr;
+    historyChart.height = height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    // 清除画布
+    ctx.clearRect(0, 0, width, height);
     
     // 清除画布
     ctx.clearRect(0, 0, width, height);
