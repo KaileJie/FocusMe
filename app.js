@@ -32,6 +32,39 @@ const todayTodos = document.getElementById('todayTodos');
 const todayMinutes = document.getElementById('todayMinutes');
 const historyList = document.getElementById('historyList');
 
+// 请求通知权限
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+            console.log('Notification permission:', permission);
+        });
+    }
+}
+
+// 发送桌面通知
+function sendNotification(title, options = {}) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        const notification = new Notification(title, {
+            icon: '/icon-192.png',
+            badge: '/icon-192.png',
+            tag: 'focus-me-timer',
+            requireInteraction: false,
+            ...options
+        });
+        
+        // 自动关闭通知
+        setTimeout(() => {
+            notification.close();
+        }, 5000);
+        
+        // 点击通知时聚焦窗口
+        notification.onclick = () => {
+            window.focus();
+            notification.close();
+        };
+    }
+}
+
 // 初始化
 function init() {
     loadData();
@@ -39,6 +72,7 @@ function init() {
     renderTodos();
     renderHistory();
     updateStats();
+    requestNotificationPermission();
     
     // 事件监听
     startBtn.addEventListener('click', startTimer);
@@ -49,6 +83,25 @@ function init() {
     addTodoBtn.addEventListener('click', addTodo);
     todoInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addTodo();
+    });
+    
+    // 时间筛选按钮事件
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentPeriod = btn.dataset.period;
+            renderHistory();
+        });
+    });
+    
+    // 窗口大小调整时重新绘制图表
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            renderHistory();
+        }, 250);
     });
 }
 
@@ -188,6 +241,13 @@ function completeTimer() {
         updateStats();
         saveData();
         
+            // 发送桌面通知
+        sendNotification('🍅 Focus Time Complete!', {
+            body: `Great job! You've completed ${state.todayStats.pomodoros} pomodoro${state.todayStats.pomodoros > 1 ? 's' : ''} today. Time for a break!`,
+            badge: '/icon-192.png',
+            vibrate: [200, 100, 200]
+        });
+        
         // Ask if user wants to start break
         setTimeout(() => {
             if (confirm('Focus time complete! Start break?')) {
@@ -199,6 +259,13 @@ function completeTimer() {
     } else {
         // Break ended
         timerStatus.textContent = 'Break complete!';
+        
+        // 发送桌面通知
+        sendNotification('✨ Break Complete!', {
+            body: 'Ready to focus again? Start a new pomodoro session!',
+            badge: '/icon-192.png'
+        });
+        
         resetTimer();
     }
 }
@@ -318,31 +385,169 @@ function updateStats() {
     todayMinutes.textContent = state.todayStats.minutes;
 }
 
-function renderHistory() {
-    historyList.innerHTML = '';
+// 获取按时间周期筛选的数据
+function getFilteredHistory() {
+    if (state.history.length === 0) return [];
     
-    if (state.history.length === 0) {
-        historyList.innerHTML = '<div style="text-align: center; color: var(--text-light); padding: 20px;">No history yet</div>';
+    const now = new Date();
+    let startDate;
+    
+    switch (currentPeriod) {
+        case 'week':
+            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            break;
+        case 'month':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+        case 'year':
+            startDate = new Date(now.getFullYear(), 0, 1);
+            break;
+        default:
+            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    }
+    
+    return state.history.filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate >= startDate;
+    });
+}
+
+// 按日期分组数据
+function groupHistoryByDate(history) {
+    const grouped = {};
+    
+    history.forEach(record => {
+        const date = new Date(record.date);
+        let key;
+        
+        if (currentPeriod === 'week') {
+            key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        } else if (currentPeriod === 'month') {
+            key = `Week ${Math.ceil(date.getDate() / 7)}`;
+        } else {
+            key = date.toLocaleDateString('en-US', { month: 'short' });
+        }
+        
+        if (!grouped[key]) {
+            grouped[key] = { pomodoros: 0, minutes: 0, tasks: 0 };
+        }
+        
+        grouped[key].pomodoros += record.pomodoros || 0;
+        grouped[key].minutes += record.minutes || 0;
+        grouped[key].tasks += record.completedTodos || 0;
+    });
+    
+    return grouped;
+}
+
+// 绘制柱状图
+function drawChart(data) {
+    if (!historyChart) return;
+    
+    const ctx = historyChart.getContext('2d');
+    const width = historyChart.width = historyChart.offsetWidth;
+    const height = historyChart.height = 200;
+    
+    // 清除画布
+    ctx.clearRect(0, 0, width, height);
+    
+    if (Object.keys(data).length === 0) {
+        ctx.fillStyle = '#64748B';
+        ctx.font = '14px -apple-system';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available', width / 2, height / 2);
         return;
     }
     
-    // 显示最近7天的记录
-    const recentHistory = state.history.slice(-7).reverse();
+    const labels = Object.keys(data);
+    const values = labels.map(key => data[key].pomodoros);
+    const maxValue = Math.max(...values, 1);
     
-    recentHistory.forEach(record => {
+    const padding = 40;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+    const barWidth = chartWidth / labels.length * 0.7;
+    const barSpacing = chartWidth / labels.length;
+    
+    // 绘制柱状图
+    labels.forEach((label, index) => {
+        const value = values[index];
+        const barHeight = (value / maxValue) * chartHeight;
+        const x = padding + index * barSpacing + (barSpacing - barWidth) / 2;
+        const y = height - padding - barHeight;
+        
+        // 柱状图
+        const gradient = ctx.createLinearGradient(0, y, 0, height - padding);
+        gradient.addColorStop(0, '#EF4444');
+        gradient.addColorStop(1, '#DC2626');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, barWidth, barHeight);
+        
+        // 数值标签
+        if (value > 0) {
+            ctx.fillStyle = '#0F172A';
+            ctx.font = '12px -apple-system';
+            ctx.textAlign = 'center';
+            ctx.fillText(value, x + barWidth / 2, y - 5);
+        }
+        
+        // X轴标签
+        ctx.fillStyle = '#64748B';
+        ctx.font = '11px -apple-system';
+        ctx.textAlign = 'center';
+        ctx.save();
+        ctx.translate(x + barWidth / 2, height - padding + 15);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+    });
+    
+    // Y轴刻度
+    ctx.strokeStyle = '#E2E8F0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+}
+
+function renderHistory() {
+    const filteredHistory = getFilteredHistory();
+    
+    // 绘制图表
+    if (filteredHistory.length > 0) {
+        const groupedData = groupHistoryByDate(filteredHistory);
+        drawChart(groupedData);
+    } else {
+        drawChart({});
+    }
+    
+    // 显示列表
+    historyList.innerHTML = '';
+    
+    if (filteredHistory.length === 0) {
+        historyList.innerHTML = '<div style="text-align: center; color: var(--text-light); padding: 20px;">No history for this period</div>';
+        return;
+    }
+    
+    // 按日期分组显示
+    const grouped = groupHistoryByDate(filteredHistory);
+    const sortedLabels = Object.keys(grouped).sort((a, b) => {
+        // 简单排序，实际应该按日期
+        return a.localeCompare(b);
+    });
+    
+    sortedLabels.forEach(label => {
+        const data = grouped[label];
         const div = document.createElement('div');
         div.className = 'history-item';
         
-        const date = new Date(record.date);
-        const dateStr = date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-        });
-        
         div.innerHTML = `
-            <span class="history-date">${dateStr}</span>
+            <span class="history-date">${label}</span>
             <span class="history-stats">
-                ${record.pomodoros} pomodoros | ${record.completedTodos} tasks | ${record.minutes} min
+                ${data.pomodoros} pomodoros | ${data.tasks} tasks | ${data.minutes} min
             </span>
         `;
         

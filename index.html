@@ -156,7 +156,17 @@
                     </div>
                 </div>
                 <div class="history-section">
-                    <h3>History</h3>
+                    <div class="history-header">
+                        <h3>History & Analytics</h3>
+                        <div class="time-filter">
+                            <button class="filter-btn active" data-period="week">Week</button>
+                            <button class="filter-btn" data-period="month">Month</button>
+                            <button class="filter-btn" data-period="year">Year</button>
+                        </div>
+                    </div>
+                    <div id="chartContainer" class="chart-container">
+                        <canvas id="historyChart"></canvas>
+                    </div>
                     <div id="historyList" class="history-list"></div>
                 </div>
             </section>
